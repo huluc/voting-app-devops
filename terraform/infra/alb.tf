@@ -49,6 +49,9 @@ resource "aws_lb_target_group" "vote" {
   health_check {
     path    = "/"
     matcher = "200"
+    interval = 10
+    healthy_threshold = 2
+    unhealthy_threshold = 2
   }
 }
 
@@ -61,6 +64,9 @@ resource "aws_lb_target_group" "result" {
   health_check {
     path    = "/"
     matcher = "200"
+    interval = 10
+    healthy_threshold = 2
+    unhealthy_threshold = 2
   }
 }
 
