@@ -49,6 +49,9 @@ resource "aws_lb_target_group" "vote" {
   health_check {
     path    = "/"
     matcher = "200"
+    interval = 10
+    healthy_threshold = 2
+    unhealthy_threshold = 2
   }
 }
 
@@ -61,6 +64,9 @@ resource "aws_lb_target_group" "result" {
   health_check {
     path    = "/"
     matcher = "200"
+    interval = 10
+    healthy_threshold = 2
+    unhealthy_threshold = 2
   }
 }
 
@@ -74,6 +80,19 @@ resource "aws_lb_target_group_attachment" "vote_a" {
 resource "aws_lb_target_group_attachment" "result_a" {
   target_group_arn = aws_lb_target_group.result.arn
   target_id        = aws_instance.frontend.id
+  port             = 8081
+}
+
+# ---------- Register A2 in both target groups ----------
+resource "aws_lb_target_group_attachment" "vote_b" {
+  target_group_arn = aws_lb_target_group.vote.arn
+  target_id        = aws_instance.frontend_b.id
+  port             = 8080
+}
+
+resource "aws_lb_target_group_attachment" "result_b" {
+  target_group_arn = aws_lb_target_group.result.arn
+  target_id        = aws_instance.frontend_b.id
   port             = 8081
 }
 
