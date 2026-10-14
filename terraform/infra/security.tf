@@ -5,27 +5,27 @@ resource "aws_security_group" "frontend" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Vote from the internet"
+    description = "Vote only from the ALB"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb.id]
   }
 
   ingress {
-    description = "Result from the internet"
+    description = "Result only from the ALB"
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.alb.id]
   }
 
   ingress {
-    description = "SSH only from my IP"
+    description = "SSH only from the bastion"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.my_ip]
+    security_groups = [aws_security_group.bastion.id]
   }
 
   egress {
@@ -56,11 +56,11 @@ resource "aws_security_group" "backend" {
   }
 
   ingress {
-    description     = "SSH from bastion (frontend)"
+    description     = "SSH from the bastion"
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.frontend.id]
+    security_groups = [aws_security_group.bastion.id]
   }
 
   egress {
@@ -94,11 +94,11 @@ resource "aws_security_group" "db" {
   }
 
   ingress {
-    description     = "SSH from bastion (frontend)"
+    description     = "SSH from the bastion"
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.frontend.id]
+    security_groups = [aws_security_group.bastion.id]
   }
 
   egress {
@@ -111,5 +111,32 @@ resource "aws_security_group" "db" {
 
   tags = {
     Name = "hserindik-voting-app-db-sg"
+  }
+}
+
+# ---------- SG: Bastion (SSH only) ----------
+resource "aws_security_group" "bastion" {
+  name        = "hserindik-voting-app-bastion-sg"
+  description = "SSH only from my IP"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "SSH only from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "hserindik-voting-app-bastion-sg"
   }
 }
