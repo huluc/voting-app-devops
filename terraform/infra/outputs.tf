@@ -22,3 +22,8 @@ output "alb_dns_name" {
   description = "ALB address: http://<this>/vote and http://<this>/result"
   value       = aws_lb.main.dns_name
 }
+
+output "frontend_b_private_ip" {
+  description = "A2: private IP (second frontend, us-east-1b)"
+  value       = aws_instance.frontend_b.private_ip
+}

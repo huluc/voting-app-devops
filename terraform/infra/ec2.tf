@@ -55,3 +55,16 @@ resource "aws_instance" "bastion" {
     Name = "hserindik-voting-app-bastion"
   }
 }
+
+# ---------- A2: second frontend in the second AZ ----------
+resource "aws_instance" "frontend_b" {
+  ami                    = var.ami_id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.private_frontend_b.id
+  vpc_security_group_ids = [aws_security_group.frontend.id]
+  key_name               = aws_key_pair.main.key_name
+
+  tags = {
+    Name = "hserindik-voting-app-A2-frontend"
+  }
+}

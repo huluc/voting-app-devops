@@ -146,3 +146,19 @@ resource "aws_route_table_association" "private_frontend" {
   subnet_id      = aws_subnet.private_frontend.id
   route_table_id = aws_route_table.private.id
 }
+
+# ---------- Second frontend: private subnet in the second AZ ----------
+resource "aws_subnet" "private_frontend_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.6.0/24"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "hserindik-voting-app-private-frontend-b"
+  }
+}
+
+resource "aws_route_table_association" "private_frontend_b" {
+  subnet_id      = aws_subnet.private_frontend_b.id
+  route_table_id = aws_route_table.private.id
+}
